@@ -1,4 +1,108 @@
 # projectBlog
+이번에 시도하는 것들 :
+
+ERD
+
+JWT를 활용하기
+
+JPA 연관관계 설정
+
+1. ERD (Entity Relation Diagram)
+   작성중..
+
+2. API 명세서
+1) 새로 구현하는 기능
+작성중..
+2) 
+2) 수정하는 기능
+작성중..
+
+3. 프로젝트 시작
+   추가하는 클래스
+
+Entity User
+
+UserService
+
+UserRepository
+
+SignupRequestDto
+
+LoginRequestDto
+
+JwtUtil
+
+
+
+22.12.16 트러블 슈팅
+
+- 클래스를 생성한 후 테스트를 위해 실행 : secret key 설정을 깜빡함 -> app 설정에 추가
+
+- 회원가입 기능을 테스트 하기 위해 서버 구동 및 Postman으로 POST 쿼리 발송 :
+
+email 값이 제대로 전송되지 않음 : Http 500, not-null property references a null or transient value 오류
+
+-> 클래스 간 값의 이동이 제대로 되지 않는 경우, 내 경우엔 ajax 형식으로 UserController에서 값을 받기 때문에 @ResponeBody, 파라미터에 @RequestBody를 붙여줘야 했으나 이를 잊어 배달사고 발생 ~ 해결
+
+- 회원가입 시 아이디, 비밀번호의 글자 수 및 속성 알파벳, 숫자 제한 조건 추가하기 : UserService에 추가
+
++ 정규표현식 사용
+
+참조한 글: https://zzang9ha.tistory.com/322
+
+
+[Java] - 자바 정규 표현식(Regular Expression) + 2021 카카오 코테(신규 아이디 추천)
+
+안녕하세요~ 이전에 운영하던 블로그 및 GitHub, 공부 내용을 정리하는 Study-GitHub 가 있습니다! • 네이버 블로그 • GitHub • Study-GitHub • 🐔 ✔ 정규 표현식(Regular Expression) 안녕하세요, 이번에 정
+
+zzang9ha.tistory.com
+- JWT 토큰 값이 올바르게 생성되지 않습니다 : 쿠키 헤더가 받은 Bearer 값이 올바르지 않은 쿠키라고 하며 JWT 토큰이 생성되지 않음(로그인을 제대로 하지 않고 글 작성한 경우 발생하는 오류였다) -> PostService의 createPost 메서드에서 토큰을 확인한 후 토큰에 저장된 사용자 정보를 조회 및 요청 DTO의 내용을 객체에 담아 Flush 하는 코드를 잊고 작성하지 않음 : 작성 후 테스트 : 로그인까진 잘 되나, 글 작성 POST 메서드를 날리면 오류는 없지만 DB에 저장이 되지 않고, null 출력 + 디버깅 : token 값이 null이다. -> Postman에서 JWT를 저장해야하는데 이를 놓침 -> JWT 만드는 방법을 공부하다 Postman에서 출력되는 것 확인 후 Postman에 입력 : 해결
+
+
+
++Optional 타입 메서드는 void 설정할 수 없다?
+
+
+
+22.12.18
+
+수정/ 삭제메서드 진행중..
+
+
+
+
+
+연관관계 설정 :
+
+회원가입 하며 만들어 둔 JWT 토큰을 참조하여 게시물 작성 시 해당 토큰을 불러오고 검증을 통해 그 회원이 맞는 지 인증 후 게시물 작성 기능이 수행될 수 있도록 인가
+
+수정/ 삭제 기능도 동일하게 적용, 다만 저번 과제 때 boolean으로 접근해 만들어둔 비밀번호 확인 기능이 더 이상 필요가 없어 수정/ 삭제 메서드 및 PostController에 있는 관련 메서드의 타입을 void로 변경
+
+4. 체크포인트
+   처음 설계한 API 명세서에 변경사항이 있었나요? 변경 되었다면 어떤 점 때문 일까요? 첫 설계의 중요성에 대해 작성해 주세요!
+
+-
+
+ERD를 먼저 설계한 후 Entity를 개발했을 때 어떤 점이 도움이 되셨나요?
+
+-
+
+JWT를 사용하여 인증/인가를 구현 했을 때의 장점은 무엇일까요?
+
+-
+
+반대로 JWT를 사용한 인증/인가의 한계점은 무엇일까요?
+
+-
+
+만약 댓글 기능이 있는 블로그에서 댓글이 달려있는 게시글을 삭제하려고 한다면 무슨 문제가 발생할까요? Database 테이블 관점에서 해결방법이 무엇일까요?
+
+-
+
+IoC / DI 에 대해 간략하게 설명해 주세요!
+
+-
+====================================================================================================================
 1. Usecase 작성
 ![img](https://user-images.githubusercontent.com/110814973/206435978-5dbd3c82-e741-4b25-831f-014eea9f7ce4.png)
 
@@ -108,4 +212,4 @@ Repository는 JPARepository를 상속받고 추후 발생가능한 다중 상속
 아직 Optional 타입을 정확하게 이해하지 못했다.
 
 
-엔티티 Post에는 Dto에서 받은 Json 데이터가 각 메서드에 맞게 초기화를 거쳐 데이터베이스와 일치하는 인스턴스가 되어 해당 기능을 수한다.
+엔티티 Post에는 Dto에서 받은 Json 데이터가 각 메서드에 맞게 초기화를 거쳐 데이터베이스와 일치하는 인스턴스가 되어 해당 기능을 수행한다.
