@@ -19,9 +19,11 @@ import java.util.Date;
 @Component // 의존성 주입이 가능하도록 어노테이션 설정
 @RequiredArgsConstructor
 public class JwtUtil {
-
+    // Header KEY 값
     public static final String AUTHORIZATION_HEADER = "Authorization";
-    private static final String BEARER_PREFIX = "Bearer";
+    // Token 식별자
+    private static final String BEARER_PREFIX = "Bearer ";
+    // 토큰 만료시간
     private static final long TOKEN_TIME = 60 * 60 * 1000L;
 
     @Value("${jwt.secret.key}")

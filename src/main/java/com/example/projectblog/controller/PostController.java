@@ -1,6 +1,7 @@
 package com.example.projectblog.controller;
 
 import com.example.projectblog.dto.PostRequestDto;
+import com.example.projectblog.dto.PostResponseDto;
 import com.example.projectblog.entity.Post;
 import com.example.projectblog.service.PostService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,7 +18,7 @@ public class PostController {
     private final PostService postService;
 
     @PostMapping("api/posts")
-    public Post createPost(@RequestBody PostRequestDto postRequestDto, HttpServletRequest request) {
+    public PostResponseDto createPost(@RequestBody PostRequestDto postRequestDto, HttpServletRequest request) {
         return postService.createPost(postRequestDto,request);
     }
 
