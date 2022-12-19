@@ -14,8 +14,15 @@ JPA 연관관계 설정
 2. API 명세서
 2-1 숙련 Lv 1
 1) 새로 구현하는 기능
+![image](https://user-images.githubusercontent.com/110814973/208371240-946448f9-91ae-4522-a2d8-8c3d7c157b55.png)
 
-2) 
+2) 수정하는 기능
+![image](https://user-images.githubusercontent.com/110814973/208371331-3508a77f-071d-4b1a-8f09-b53853bc6557.png)
+
+
+2-2 숙련 Lv2
+1) 새로 추가하는 기능
+
 2) 수정하는 기능
 
 
