@@ -34,12 +34,12 @@ public class UserService {
 
         // 등록 시 제한사항 설정 및 확인
         String usernamePattern = "^[a-z0-9]{4,10}$";
-        String pwdPattern = "^[a-zA-Z0-9]{8,15}$";
+        String pwdPattern = "^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,15}$";
         if (!Pattern.matches(usernamePattern, username)) {
-            throw new IllegalArgumentException("아이디를 다시 확인해주세요.");
+            throw new IllegalArgumentException("조건에 일지하지 않는 아이디입니다. 아이디를 다시 확인해주세요.");
         }
         if (!Pattern.matches(pwdPattern, password)) {
-            throw new IllegalArgumentException("비밀번호를 다시 확인해주세요.");
+            throw new IllegalArgumentException("조건에 일지하지 않는 비밀번호입니다. 비밀번호를 다시 확인해주세요.");
         }
 
         User user = new User(username, password, email);

@@ -36,7 +36,7 @@ public class PostService {
             if (jwtUtil.validateToken(token)) {
                 claims = jwtUtil.getUserInfoFromToken(token);
             } else {
-                throw new IllegalArgumentException("Token Error");
+                throw new IllegalArgumentException("토큰이 유효하지 않습니다. StatusCode 400");
             }
 
             // 토큰에서 가져온 사용자 정보를 사용하여 DB 조회
@@ -71,7 +71,7 @@ public class PostService {
             if (jwtUtil.validateToken(token)) {
                 claims = jwtUtil.getUserInfoFromToken(token);
             } else {
-                throw new IllegalArgumentException("Token Error");
+                throw new IllegalArgumentException("토큰이 유효하지 않습니다. StatusCode 400");
             }
 
             User user = userRepository.findByUsername(claims.getSubject()).orElseThrow(
@@ -82,13 +82,23 @@ public class PostService {
                     () -> new IllegalArgumentException("존재하지 않는 글입니다.")
             );
 
-            post.update(postRequestDto, user.getId());
+            post.update(postRequestDto);
+            // 업데이트 결과를 PostResponseDto 타입의 객체에 담아 보내기 위해선?
         }
     }
 
-    public void delete(Long id, HttpServletRequest request) {
+    public String delete(Long id, HttpServletRequest request) {
         String token = jwtUtil.resolveToken(request);
-        if (jwtUtil.validateToken(token))
-            postRepository.deleteById(id);
+
+        if (token != null) {
+            if (jwtUtil.validateToken(token)) {
+                postRepository.deleteById(id);
+                return "삭제되었습니다.";
+            } else {
+                throw new IllegalArgumentException("토큰이 유효하지 않습니다. StatusCode 400");
+            }
+        } else {
+            return null;
+        }
     }
 }

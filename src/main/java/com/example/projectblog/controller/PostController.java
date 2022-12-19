@@ -33,12 +33,12 @@ public class PostController {
     }
 
     @PutMapping("api/posts/{id}")
-    public void updatePost(@PathVariable Long id, @RequestBody HttpServletRequest request, PostRequestDto postRequestDto) {
+    public void updatePost(@PathVariable Long id, HttpServletRequest request, @RequestBody PostRequestDto postRequestDto) {
         postService.update(id, request, postRequestDto);
     }
 
     @DeleteMapping("api/posts/{id}")
-    public void deletePost(@PathVariable Long id, @RequestBody HttpServletRequest request) {
-        postService.delete(id, request);
+    public String deletePost(@PathVariable Long id, HttpServletRequest request) {
+        return postService.delete(id, request);
     }
 }

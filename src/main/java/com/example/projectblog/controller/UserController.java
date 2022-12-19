@@ -19,6 +19,8 @@ public class UserController {
     @ResponseBody
     @PostMapping("/signup")
     public String signup(@RequestBody SignupRequestDto signupRequestDto) {
+        System.out.println("아이디를 입력해주세요, 최소 4자 이상 10자 이하, 알파벳 소문자, 숫자");
+        System.out.println("비밀번호를 입력해주세요, 최소 8자 이상 15자 이하, 알파벳 대소문자, 숫자,특수문자");
         userService.signup(signupRequestDto);
         return "success";
     }
