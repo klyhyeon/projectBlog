@@ -14,6 +14,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class CommentService {
@@ -25,7 +28,7 @@ public class CommentService {
     private final JwtUtil jwtUtil;
 
     @Transactional
-    public CommentResponseDto createComment(CommentRequestDto commentRequestDto, HttpServletRequest request) {
+    public CommentResponseDto createComment(Long id, CommentRequestDto commentRequestDto, HttpServletRequest request) {
         String token = jwtUtil.resolveToken(request);
         Claims claims;
 
@@ -50,6 +53,16 @@ public class CommentService {
         }
     }
 
+    @Transactional(readOnly = true)
+    public List<Comment> getComments() {
+        return commentRepository.findAllByOrderByModifiedAtDesc();
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<Comment> getCommentById(Long id) {
+        return commentRepository.findById(id);
+    }
+
     @Transactional
     public void update(Long id, Long commentId, HttpServletRequest request, CommentRequestDto commentRequestDto) {
         String token = jwtUtil.resolveToken(request);
@@ -66,7 +79,7 @@ public class CommentService {
                     () -> new IllegalArgumentException("존재하지 않는 사용자입니다.")
             );
 
-            Comment comment = commentRepository.findById(id).orElseThrow(
+            Comment comment = commentRepository.findById(commentId).orElseThrow(
                     () -> new IllegalArgumentException("존재하지 않는 글입니다.")
             );
 
@@ -98,7 +111,7 @@ public class CommentService {
                         () -> new IllegalArgumentException("존재하지 않는 사용자입니다.")
                 );
 
-                Comment comment = commentRepository.findById(id).orElseThrow(
+                Comment comment = commentRepository.findById(commentId).orElseThrow(
                         () -> new IllegalArgumentException("존재하지 않는 글입니다.")
                 );
 
@@ -108,10 +121,10 @@ public class CommentService {
 
                 if (userRoleEnum == UserRoleEnum.ADMIN) {
                     // 관리자일 경우
-                    commentRepository.deleteById(id);
+                    commentRepository.deleteById(commentId);
 
                 } else if (userRoleEnum == UserRoleEnum.USER && user.getUsername().equals(comment.getUsername())) { // 사용자 권한이 USER일 경우
-                    commentRepository.deleteById(id);
+                    commentRepository.deleteById(commentId);
                 } else { // 본인의 글이 아닐 경우
                     throw new IllegalArgumentException("본인의 글이 아닙니다.");
                 }

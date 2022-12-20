@@ -2,10 +2,12 @@ package com.example.projectblog.service;
 
 import com.example.projectblog.dto.PostRequestDto;
 import com.example.projectblog.dto.PostResponseDto;
+import com.example.projectblog.entity.Comment;
 import com.example.projectblog.entity.Post;
 import com.example.projectblog.entity.User;
 import com.example.projectblog.entity.UserRoleEnum;
 import com.example.projectblog.jwt.JwtUtil;
+import com.example.projectblog.repository.CommentRepository;
 import com.example.projectblog.repository.PostRepository;
 import com.example.projectblog.repository.UserRepository;
 import io.jsonwebtoken.Claims;
@@ -28,6 +30,8 @@ public class PostService {
 
     private final JwtUtil jwtUtil;
 
+    private final CommentRepository commentRepository;
+
     @Transactional
     public PostResponseDto createPost(PostRequestDto postRequestDto, HttpServletRequest request) {
         String token = jwtUtil.resolveToken(request);
@@ -46,7 +50,10 @@ public class PostService {
                     () -> new IllegalArgumentException("사용자가 존재하지 않습니다.")
             );
 
-            Post post = postRepository.saveAndFlush(new Post(postRequestDto, user.getId()));
+            // 비어있는 코멘트 리스트 가져오기
+            List<Comment> commentList = commentRepository.findAllByOrderByModifiedAtDesc();
+
+            Post post = postRepository.saveAndFlush(new Post(postRequestDto, user.getId(), commentList));
 
             return new PostResponseDto(post);
         } else {

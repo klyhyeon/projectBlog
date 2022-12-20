@@ -2,7 +2,6 @@ package com.example.projectblog.controller;
 
 import com.example.projectblog.dto.CommentRequestDto;
 import com.example.projectblog.dto.CommentResponseDto;
-import com.example.projectblog.entity.Comment;
 import com.example.projectblog.service.CommentService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -15,8 +14,8 @@ public class CommentController {
     private final CommentService commentService;
 
     @PostMapping("/api/posts/{id}")
-    public CommentResponseDto createComment(@RequestBody CommentRequestDto commentRequestDto, HttpServletRequest request) {
-        return commentService.createComment(commentRequestDto, request);
+    public CommentResponseDto createComment(@PathVariable Long id, @RequestBody CommentRequestDto commentRequestDto, HttpServletRequest request) {
+        return commentService.createComment(id, commentRequestDto, request);
     }
 
     @PutMapping("/api/posts/{id}/{commentId}")

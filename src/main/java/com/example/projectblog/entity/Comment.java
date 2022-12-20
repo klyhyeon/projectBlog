@@ -2,8 +2,10 @@ package com.example.projectblog.entity;
 
 import com.example.projectblog.dto.CommentRequestDto;
 import jakarta.persistence.*;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Getter
 @Entity
 @NoArgsConstructor
 public class Comment {
@@ -21,21 +23,9 @@ public class Comment {
     @Column
     private String comments;
 
-    public Long getId() {
-        return id;
-    }
-
-    public Long getUserId() {
-        return userId;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public String getComments() {
-        return comments;
-    }
+    @ManyToOne(fetch = FetchType.LAZY) // 연관관계 설정
+    @JoinColumn
+    private Post post;
 
     public Comment(CommentRequestDto commentRequestDto, Long userId) {
         this.username = commentRequestDto.getUsername();
