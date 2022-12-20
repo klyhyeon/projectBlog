@@ -3,6 +3,7 @@ package com.example.projectblog.service;
 import com.example.projectblog.dto.LoginRequestDto;
 import com.example.projectblog.dto.SignupRequestDto;
 import com.example.projectblog.entity.User;
+import com.example.projectblog.entity.UserRoleEnum;
 import com.example.projectblog.jwt.JwtUtil;
 import com.example.projectblog.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,8 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
+
+    private static final String ADMIN_TOKEN = "AAABnvxRVklrnYxKZ0aHgTBcXukeZygoC";
 
     @Transactional
     public void signup(SignupRequestDto signupRequestDto) {
@@ -42,7 +45,18 @@ public class UserService {
             throw new IllegalArgumentException("조건에 일지하지 않는 비밀번호입니다. 비밀번호를 다시 확인해주세요.");
         }
 
-        User user = new User(username, password, email);
+        // 사용자 ROLE 확인
+        UserRoleEnum role = UserRoleEnum.USER;
+        if (signupRequestDto.isAdmin()) {
+            if (!signupRequestDto.getAdminToken().equals(ADMIN_TOKEN)) {
+                throw new IllegalArgumentException("관리자 암호가 틀려 관리자로 등록이 불가능합니다.");
+            }
+            role = UserRoleEnum.ADMIN;
+        }
+        if (signupRequestDto.getAdminToken().equals("")) {
+            role = UserRoleEnum.USER;
+        }
+        User user = new User(username, password, email, role);
         userRepository.save(user);
     }
 
@@ -57,9 +71,10 @@ public class UserService {
         );
         // 비밀번호 확인
         if(!user.getPassword().equals(password)){
-            throw  new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
 
+        // header 자동 등록?
         response.addHeader(JwtUtil.AUTHORIZATION_HEADER, jwtUtil.createToken(user.getUsername()));
     }
 }

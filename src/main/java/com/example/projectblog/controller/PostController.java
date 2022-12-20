@@ -17,12 +17,12 @@ public class PostController {
 
     private final PostService postService;
 
-    @PostMapping("api/posts")
+    @PostMapping("/api/posts")
     public PostResponseDto createPost(@RequestBody PostRequestDto postRequestDto, HttpServletRequest request) {
         return postService.createPost(postRequestDto,request);
     }
 
-    @GetMapping("api/posts")
+    @GetMapping("/api/posts")
     public List<Post> getPosts() {
         return postService.getPosts();
     }
@@ -32,12 +32,12 @@ public class PostController {
         return postService.getPostById(id);
     }
 
-    @PutMapping("api/posts/{id}")
+    @PutMapping("/api/posts/{id}")
     public void updatePost(@PathVariable Long id, HttpServletRequest request, @RequestBody PostRequestDto postRequestDto) {
         postService.update(id, request, postRequestDto);
     }
 
-    @DeleteMapping("api/posts/{id}")
+    @DeleteMapping("/api/posts/{id}")
     public String deletePost(@PathVariable Long id, HttpServletRequest request) {
         return postService.delete(id, request);
     }

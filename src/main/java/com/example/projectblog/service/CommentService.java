@@ -1,12 +1,12 @@
 package com.example.projectblog.service;
 
-import com.example.projectblog.dto.PostRequestDto;
-import com.example.projectblog.dto.PostResponseDto;
-import com.example.projectblog.entity.Post;
+import com.example.projectblog.dto.CommentRequestDto;
+import com.example.projectblog.dto.CommentResponseDto;
+import com.example.projectblog.entity.Comment;
 import com.example.projectblog.entity.User;
 import com.example.projectblog.entity.UserRoleEnum;
 import com.example.projectblog.jwt.JwtUtil;
-import com.example.projectblog.repository.PostRepository;
+import com.example.projectblog.repository.CommentRepository;
 import com.example.projectblog.repository.UserRepository;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,22 +14,18 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-
 @Service
 @RequiredArgsConstructor
-public class PostService {
+public class CommentService {
 
-    private final PostRepository postRepository;
+    private final CommentRepository commentRepository;
 
     private final UserRepository userRepository;
 
     private final JwtUtil jwtUtil;
 
     @Transactional
-    public PostResponseDto createPost(PostRequestDto postRequestDto, HttpServletRequest request) {
+    public CommentResponseDto createComment(CommentRequestDto commentRequestDto, HttpServletRequest request) {
         String token = jwtUtil.resolveToken(request);
         Claims claims;
 
@@ -46,26 +42,16 @@ public class PostService {
                     () -> new IllegalArgumentException("사용자가 존재하지 않습니다.")
             );
 
-            Post post = postRepository.saveAndFlush(new Post(postRequestDto, user.getId()));
+            Comment comment = commentRepository.saveAndFlush(new Comment(commentRequestDto, user.getId()));
 
-            return new PostResponseDto(post);
+            return new CommentResponseDto(comment);
         } else {
             return null;
         }
     }
 
-    @Transactional(readOnly = true)
-    public List<Post> getPosts() {
-        return postRepository.findAllByOrderByModifiedAtDesc();
-    }
-
-    @Transactional(readOnly = true)
-    public Optional<Post> getPostById(Long id) {
-        return postRepository.findById(id);
-    }
-
     @Transactional
-    public void update(Long id, HttpServletRequest request, PostRequestDto postRequestDto) {
+    public void update(Long id, Long commentId, HttpServletRequest request, CommentRequestDto commentRequestDto) {
         String token = jwtUtil.resolveToken(request);
         Claims claims;
 
@@ -80,7 +66,7 @@ public class PostService {
                     () -> new IllegalArgumentException("존재하지 않는 사용자입니다.")
             );
 
-            Post post = postRepository.findById(id).orElseThrow(
+            Comment comment = commentRepository.findById(id).orElseThrow(
                     () -> new IllegalArgumentException("존재하지 않는 글입니다.")
             );
 
@@ -90,19 +76,18 @@ public class PostService {
 
             if (userRoleEnum == UserRoleEnum.ADMIN) {
                 // 관리자일 경우
-                post.update(postRequestDto);
+                comment.update(commentRequestDto);
 
-            } else if (userRoleEnum == UserRoleEnum.USER && user.getUsername().equals(post.getUsername())) { // 사용자 권한이 USER일 경우
-                post.update(postRequestDto);
+            } else if (userRoleEnum == UserRoleEnum.USER && user.getUsername().equals(comment.getUsername())) { // 사용자 권한이 USER일 경우
+                comment.update(commentRequestDto);
             } else { // 본인의 글이 아닐 경우
                 throw new IllegalArgumentException("본인의 글이 아닙니다.");
             }
         }
-            // 업데이트 결과를 PostResponseDto 타입의 객체에 담아 보내기 위해선?
-        }
+    }
 
     @Transactional
-    public String delete(Long id, HttpServletRequest request) {
+    public String delete(Long id, Long commentId, HttpServletRequest request) {
         String token = jwtUtil.resolveToken(request);
         Claims claims;
 
@@ -113,7 +98,7 @@ public class PostService {
                         () -> new IllegalArgumentException("존재하지 않는 사용자입니다.")
                 );
 
-                Post post = postRepository.findById(id).orElseThrow(
+                Comment comment = commentRepository.findById(id).orElseThrow(
                         () -> new IllegalArgumentException("존재하지 않는 글입니다.")
                 );
 
@@ -123,10 +108,10 @@ public class PostService {
 
                 if (userRoleEnum == UserRoleEnum.ADMIN) {
                     // 관리자일 경우
-                    postRepository.deleteById(id);
+                    commentRepository.deleteById(id);
 
-                } else if (userRoleEnum == UserRoleEnum.USER && user.getUsername().equals(post.getUsername())) { // 사용자 권한이 USER일 경우
-                    postRepository.deleteById(id);
+                } else if (userRoleEnum == UserRoleEnum.USER && user.getUsername().equals(comment.getUsername())) { // 사용자 권한이 USER일 경우
+                    commentRepository.deleteById(id);
                 } else { // 본인의 글이 아닐 경우
                     throw new IllegalArgumentException("본인의 글이 아닙니다.");
                 }
