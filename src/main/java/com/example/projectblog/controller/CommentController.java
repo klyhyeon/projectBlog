@@ -14,13 +14,13 @@ public class CommentController {
     private final CommentService commentService;
 
     @PostMapping("/api/posts/{id}")
-    public CommentResponseDto createComment(@PathVariable Long id, @RequestBody CommentRequestDto commentRequestDto, HttpServletRequest request) {
-        return commentService.createComment(id, commentRequestDto, request);
+    public void createComment(@PathVariable Long id, @RequestBody CommentRequestDto commentRequestDto, HttpServletRequest request) {
+        commentService.createComment(id, request, commentRequestDto);
     }
 
     @PutMapping("/api/posts/{id}/{commentId}")
     public void updateComment(@PathVariable Long id, @PathVariable Long commentId, HttpServletRequest request, CommentRequestDto commentRequestDto) {
-        commentService.update(id,commentId,request,commentRequestDto);
+        commentService.update(id, commentId, request, commentRequestDto);
     }
 
     @DeleteMapping("/api/posts/{id}/{commentId}")

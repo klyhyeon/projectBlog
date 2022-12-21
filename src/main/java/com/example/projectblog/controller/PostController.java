@@ -19,7 +19,7 @@ public class PostController {
 
     @PostMapping("/api/posts")
     public PostResponseDto createPost(@RequestBody PostRequestDto postRequestDto, HttpServletRequest request) {
-        return postService.createPost(postRequestDto,request);
+        return postService.createPost(postRequestDto, request);
     }
 
     @GetMapping("/api/posts")

@@ -3,10 +3,12 @@ package com.example.projectblog.service;
 import com.example.projectblog.dto.CommentRequestDto;
 import com.example.projectblog.dto.CommentResponseDto;
 import com.example.projectblog.entity.Comment;
+import com.example.projectblog.entity.Post;
 import com.example.projectblog.entity.User;
 import com.example.projectblog.entity.UserRoleEnum;
 import com.example.projectblog.jwt.JwtUtil;
 import com.example.projectblog.repository.CommentRepository;
+import com.example.projectblog.repository.PostRepository;
 import com.example.projectblog.repository.UserRepository;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,10 +27,12 @@ public class CommentService {
 
     private final UserRepository userRepository;
 
+    private final PostRepository postRepository;
+
     private final JwtUtil jwtUtil;
 
     @Transactional
-    public CommentResponseDto createComment(Long id, CommentRequestDto commentRequestDto, HttpServletRequest request) {
+    public void createComment(Long postId, HttpServletRequest request, CommentRequestDto commentRequestDto) {
         String token = jwtUtil.resolveToken(request);
         Claims claims;
 
@@ -45,11 +49,15 @@ public class CommentService {
                     () -> new IllegalArgumentException("사용자가 존재하지 않습니다.")
             );
 
-            Comment comment = commentRepository.saveAndFlush(new Comment(commentRequestDto, user.getId()));
+            Post post = postRepository.findById(postId).orElseThrow(
+                    () -> new IllegalArgumentException("올바르지 않은 글 번호입니다.")
+            );
 
-            return new CommentResponseDto(comment);
-        } else {
-            return null;
+            Comment comment = Comment.createComment(
+                    user.getId(), commentRequestDto.getUsername(), commentRequestDto.getComment(), post
+            );
+
+            post.putCommentList(comment);
         }
     }
 
@@ -80,7 +88,7 @@ public class CommentService {
             );
 
             Comment comment = commentRepository.findById(commentId).orElseThrow(
-                    () -> new IllegalArgumentException("존재하지 않는 글입니다.")
+                    () -> new IllegalArgumentException("존재하지 않는 댓글입니다.")
             );
 
             // 사용자 권한 가져오기
@@ -94,7 +102,7 @@ public class CommentService {
             } else if (userRoleEnum == UserRoleEnum.USER && user.getUsername().equals(comment.getUsername())) { // 사용자 권한이 USER일 경우
                 comment.update(commentRequestDto);
             } else { // 본인의 글이 아닐 경우
-                throw new IllegalArgumentException("본인의 글이 아닙니다.");
+                throw new IllegalArgumentException("본인의 댓글이 아닙니다.");
             }
         }
     }
@@ -112,7 +120,7 @@ public class CommentService {
                 );
 
                 Comment comment = commentRepository.findById(commentId).orElseThrow(
-                        () -> new IllegalArgumentException("존재하지 않는 글입니다.")
+                        () -> new IllegalArgumentException("존재하지 않는 댓글입니다.")
                 );
 
                 // 사용자 권한 가져오기
@@ -126,7 +134,7 @@ public class CommentService {
                 } else if (userRoleEnum == UserRoleEnum.USER && user.getUsername().equals(comment.getUsername())) { // 사용자 권한이 USER일 경우
                     commentRepository.deleteById(commentId);
                 } else { // 본인의 글이 아닐 경우
-                    throw new IllegalArgumentException("본인의 글이 아닙니다.");
+                    throw new IllegalArgumentException("본인의 댓글이 아닙니다.");
                 }
             }
             return "삭제되었습니다.";

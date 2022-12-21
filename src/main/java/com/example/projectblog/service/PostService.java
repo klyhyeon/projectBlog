@@ -7,7 +7,6 @@ import com.example.projectblog.entity.Post;
 import com.example.projectblog.entity.User;
 import com.example.projectblog.entity.UserRoleEnum;
 import com.example.projectblog.jwt.JwtUtil;
-import com.example.projectblog.repository.CommentRepository;
 import com.example.projectblog.repository.PostRepository;
 import com.example.projectblog.repository.UserRepository;
 import io.jsonwebtoken.Claims;
@@ -16,8 +15,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -30,10 +29,10 @@ public class PostService {
 
     private final JwtUtil jwtUtil;
 
-    private final CommentRepository commentRepository;
+    private final CommentService commentService;
 
     @Transactional
-    public PostResponseDto createPost(PostRequestDto postRequestDto, HttpServletRequest request) {
+    public PostResponseDto createPost(PostRequestDto postRequestDto,HttpServletRequest request) {
         String token = jwtUtil.resolveToken(request);
         Claims claims;
 
@@ -50,10 +49,13 @@ public class PostService {
                     () -> new IllegalArgumentException("사용자가 존재하지 않습니다.")
             );
 
-            // 비어있는 코멘트 리스트 가져오기
-            List<Comment> commentList = commentRepository.findAllByOrderByModifiedAtDesc();
+            List<Comment> commentList = commentService.getComments();
 
-            Post post = postRepository.saveAndFlush(new Post(postRequestDto, user.getId(), commentList));
+            Post post = Post.createPost(
+                    postRequestDto.getTitle(), postRequestDto.getUsername(), postRequestDto.getContents(), user.getId(), commentList
+            );
+
+            postRepository.saveAndFlush(post);
 
             return new PostResponseDto(post);
         } else {
