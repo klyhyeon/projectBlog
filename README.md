@@ -92,6 +92,20 @@ email 값이 제대로 전송되지 않음 : Http 500, not-null property referen
 
 참조 : https://okky.kr/articles/298826
 
+2. 회원 권한 부여, 인증/인가 및 권한별 게시글 접근 권한 설정
+
+3. 댓글 관련 기능 추가하기 :
+
+1) 우선 댓글 관련 프로세스를 게시물 작성과 동일하게 처리하는 게 맞겠다는 판단 하에, Comment, CommentController, CommentService, CommentRepository, CommentRequestDto, CommentResponseDto 작성 및 구현
+
+2) 댓글과 게시물 연관관계 설정 -> 게시물 : 댓글 : 사용자 = 1: N : 1
+
+연관관계 설정에 관한 경험 부족 : 포스트 엔티티에서 코멘트 리스트에 대한 필드를 생성하고 관계설정을 해두고 어플리케이션을 실행시켜보려고 했지만, 빈 생성 에러 발생 -> 엔티티에 Timestamped 상속 표시를 안했기 때문..! (+ 왜 상속해야만 하지?)
+
+3) 코멘트리스트에 댓글 추가하기 : 댓글을 추가하였지만 연관관계 설정이 미비하여 리스트에 추가되지 않음
+
++@Builder 어노테이션을 활용, 엔티티에서 객체를 생성해서 Service에서 메서드를 호출 후 댓글과 게시물을 연결하려는 시도 중..
+
 
 연관관계 설정 :
 
