@@ -45,6 +45,17 @@ JwtUtil
 
 PostResponseDto
 
+CommentController
+
+CommentService
+
+CommentRepository
+
+CommentRequestDto
+
+CommentResponseDto
+
+Entity Comment
 
 
 22.12.16 트러블 슈팅
@@ -105,6 +116,23 @@ email 값이 제대로 전송되지 않음 : Http 500, not-null property referen
 3) 코멘트리스트에 댓글 추가하기 : 댓글을 추가하였지만 연관관계 설정이 미비하여 리스트에 추가되지 않음
 
 +@Builder 어노테이션을 활용, 엔티티에서 객체를 생성해서 Service에서 메서드를 호출 후 댓글과 게시물을 연결하려는 시도 중..
+
+4) 새로운 시도 : 교재 코드를 활용한 관계설정 후 List 생성, 서비스에서 객체를 생성하고 반복문을 사용하여 List에 객체를 담아 리스트로 반환 후 조회하기 시도
+
+-> 생각하다 보니 Post - User - Comment - Post : n : 1 : n :1? 의 복잡한 관계를 생각하다.. 이게 뭐지..
+
+다시 돌아와서 Post - Commnet의 관계만 1:n으로 설정하고 코드 시도
+
+댓글을 작성할 때 그 게시물 안에 Comment 타입의 어레이리스트를 생성하고 CommentRequestDto의 값을 참조하는 Comment 타입의 객체를 생성, 그 객체를 리스트에 담아 댓글을 작성하는 방식이라는 매커니즘은 이해했지만, 현재 Dto에 적절한 값을 넣지 못한 부분에 도달했다.
+
+5) 순환참조 에러:
+   ﻿https://k3068.tistory.com/32
+
+Jackson의 동작원리를 보고 관련 어노테이션인 @JsonBackReference, @JsonManagedReference를 사용하여 문제를 해결했다! + 다만, 아직..
+
+(1) 댓글 추가 후 응답란에 댓글의 id가 null로 표시되는 것(DB에는 정상 저장 및 조회할 때도 정상 출력)
+
+(2) ResponseDto타입의 객체를 만들어 거기에 완성된 값을 담고 반환한 후 그 객체를 참조하여 순환참조 에러를 원천 차단하는 방식에 대한 이해가 아직 부족함 ~ 이렇게 처리되는 게 맞는지 아닌지도 아직 확실하지 않음
 
 
 연관관계 설정 :

@@ -2,8 +2,10 @@ package com.example.projectblog.dto;
 
 import lombok.Getter;
 
+import java.util.List;
+
 @Getter
 public class CommentRequestDto {
-    private String username;
-    private String comment;
+    String username;
+    String comment;
 }
