@@ -2,13 +2,14 @@ package com.example.projectblog.controller;
 
 import com.example.projectblog.dto.CommentRequestDto;
 import com.example.projectblog.dto.CommentResponseDto;
-import com.example.projectblog.entity.Comment;
 import com.example.projectblog.service.CommentService;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
+import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @RequiredArgsConstructor

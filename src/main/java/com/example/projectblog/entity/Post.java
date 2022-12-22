@@ -2,11 +2,10 @@ package com.example.projectblog.entity;
 
 import com.example.projectblog.dto.PostRequestDto;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import jakarta.persistence.*;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,16 +31,21 @@ public class Post extends Timestamped {
     private String contents;
 
     @JsonManagedReference
-    @OneToMany(cascade = CascadeType.ALL)// 연관관계 설정, 비어있는 코멘트 리스트 생성
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "post")// 연관관계 설정, 비어있는 코멘트 리스트 생성
     private List<Comment> commentList = new ArrayList<>();
 
-//    @Builder
+    //    @Builder
     public Post(PostRequestDto postRequestDto, Long userId, List<Comment> commentList) {
         this.title = postRequestDto.getTitle();
         this.username = postRequestDto.getUsername();
         this.contents = postRequestDto.getContents();
         this.userId = userId;
         this.commentList = commentList;
+    }
+
+    public void add(Comment comment) {
+        comment.setPost(this); //comment -> post 주입
+        getCommentList().add(comment); //post의 commentList에 comment 주입
     }
 
 //    public static Post createPost(String title, String username, String contents, Long userId) {

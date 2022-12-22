@@ -1,9 +1,11 @@
 package com.example.projectblog.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import javax.persistence.*;
 
 @Getter
 @Entity
@@ -15,8 +17,9 @@ public class Comment extends Timestamped {
     private Long id;
 
     @JsonBackReference
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id", nullable = false)
+    @Setter
     private Post post;
 
     @Column
@@ -25,11 +28,10 @@ public class Comment extends Timestamped {
     @Column
     private String comment;
 
-//    @Builder
-    public Comment(String username, String comment, Post post) {
+    //    @Builder
+    public Comment(String username, String comment) {
         this.username = username;
         this.comment = comment;
-        this.post = post;
     }
 
 //    public static Comment createComment(String username, String comment, Post post) {
